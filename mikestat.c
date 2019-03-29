@@ -157,13 +157,14 @@ int get_socket_ino(const char* path,off_t* ino)
 
 int get_pid_inos(const uint32_t pid,struct pid_lookup_t** buf,size_t* count)
 {
-	char path[30];
+	const uint32_t max_path_len=300;
+	char path[max_path_len];
 	DIR* dp=NULL;
 	struct dirent* np=NULL;
 	struct pid_lookup_t temp;
 
-	memset(path,0,30);
-	snprintf(path,30,"/proc/%"PRIu32"/fd",pid);
+	memset(path,0,max_path_len);
+	snprintf(path,max_path_len,"/proc/%"PRIu32"/fd",pid);
 	dp=opendir(path);
 	temp.ino=0;
 	temp.pid=pid;
@@ -173,8 +174,8 @@ int get_pid_inos(const uint32_t pid,struct pid_lookup_t** buf,size_t* count)
 		if((np=readdir(dp))==NULL)
 			return closedir(dp);
 
-		memset(path,0,30);
-		snprintf(path,30,"/proc/%"PRIu32"/fd/%s",pid,np->d_name);
+		memset(path,0,max_path_len);
+		snprintf(path,max_path_len,"/proc/%"PRIu32"/fd/%s",pid,np->d_name);
 
 		if(get_socket_ino(path,&temp.ino)==0&&temp.ino!=0)
 		{
